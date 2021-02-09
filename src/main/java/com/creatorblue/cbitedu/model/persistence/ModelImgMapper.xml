@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelImgMapper">
+
+	<resultMap type="com.creatorblue.cbitedu.model.domain.ModelImg" id="img">
+			<id column="img_id" property="imgId"/> 
+			<result column="img_url" property="imgUrl"/>
+			<result column="img_start_time" property="imgStartTime"/>
+			<result column="img_end_time" property="imgEndTime"/>
+			<result column="img_upload_time" property="imgUploadTime"/>
+			<result column="img_type" property="imgType"/>
+	</resultMap>	
+			
+		
+<!-- sql模板 -->
+	<sql id="Base_Column_List">
+		img_id,
+		img_url,
+		 DATE_FORMAT(img_start_time ,'%Y-%m-%d') as img_start_time,
+		  DATE_FORMAT(img_end_time ,'%Y-%m-%d') as img_end_time ,
+		  DATE_FORMAT(img_upload_time ,'%Y-%m-%d') as img_upload_time,
+		img_type,
+		img_name
+	</sql>
+	
+	<insert id="add" parameterType="com.creatorblue.cbitedu.model.domain.ModelImg">
+		INSERT INTO t_model_img
+								(img_id, img_url, img_start_time, img_end_time, img_upload_time, img_type,img_name)
+						 VALUES (#{imgId}, #{imgUrl},#{imgStartTime}, #{imgEndTime}, now(), #{imgType},#{imgName})
+	</insert>
+	<!-- 查询 -->
+	<select id="selectPageByMap" resultMap="img" parameterType="Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_img
+		<where>
+			<if test="imgType != null and '' != imgType">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				and img_type like CONCAT('%', #{imgType},'%')
+			</if>
+		</where>
+	</select>
+	<select id="selectDetailById" resultMap="img" parameterType="String">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_img 
+		where
+		 img_id=#{imgId}
+	</select>
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelImg">
+		update 
+		t_model_img 
+		<set>	
+		<if test="imgUrl != null and '' != imgUrl">
+		    img_url=#{imgUrl},
+		</if>
+		<if test="imgStartTime != null and '' != imgStartTime">
+		    img_start_time=#{imgStartTime},
+		</if>
+		<if test="imgEndTime != null and '' != imgEndTime">
+		    img_end_time=#{imgEndTime},
+		</if>
+	     <if test="imgType != null and '' != imgType">
+		    img_type=#{imgType},
+		</if>	
+		<if test="imgName != null and '' != imgName">
+		    img_name=#{imgName}
+		</if>
+		</set>
+		where img_id=#{imgId} 
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from t_model_img where
+		img_id=#{imgId}
+	</delete>
+	<select id="selectByType" resultMap="img">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_img 
+		where
+		 img_type='新闻封面图'
+	</select>
+	
+	
+	<select id="selectBeach" resultMap="img">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_img 
+		where
+		 img_id in
+		 <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+			     #{id}
+		</foreach>
+		  
+	</select>
+
+</mapper>

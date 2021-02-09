@@ -1,0 +1,343 @@
+10
+
+dir
+0
+svn://gitee.com/chen_jia_hao/TinyMCE/tinymce5.0.3-%E5%BC%80%E5%8F%91%E7%89%88/tinymce/js/tinymce/plugins
+svn://gitee.com/chen_jia_hao/TinyMCE
+add
+
+
+
+
+
+has-props
+has-prop-mods
+
+
+
+
+
+
+
+
+
+
+
+
+a9c29a64-1316-4c15-9978-7dc6400a5181
+
+media
+dir
+
+
+
+add
+
+insertdatetime
+dir
+
+
+
+add
+
+pagebreak
+dir
+
+
+
+add
+
+image
+dir
+
+
+
+add
+
+textpattern
+dir
+
+
+
+add
+
+importcss
+dir
+
+
+
+add
+
+textcolor
+dir
+
+
+
+add
+
+noneditable
+dir
+
+
+
+add
+
+quickbars
+dir
+
+
+
+add
+
+autolink
+dir
+
+
+
+add
+
+autoresize
+dir
+
+
+
+add
+
+lists
+dir
+
+
+
+add
+
+save
+dir
+
+
+
+add
+
+emoticons
+dir
+
+
+
+add
+
+visualblocks
+dir
+
+
+
+add
+
+advlist
+dir
+
+
+
+add
+
+tabfocus
+dir
+
+
+
+add
+
+hr
+dir
+
+
+
+add
+
+anchor
+dir
+
+
+
+add
+
+colorpicker
+dir
+
+
+
+add
+
+preview
+dir
+
+
+
+add
+
+directionality
+dir
+
+
+
+add
+
+visualchars
+dir
+
+
+
+add
+
+wordcount
+dir
+
+
+
+add
+
+toc
+dir
+
+
+
+add
+
+legacyoutput
+dir
+
+
+
+add
+
+textindent
+dir
+
+
+
+add
+
+autosave
+dir
+
+
+
+add
+
+table
+dir
+
+
+
+add
+
+help
+dir
+
+
+
+add
+
+print
+dir
+
+
+
+add
+
+nonbreaking
+dir
+
+
+
+add
+
+link
+dir
+
+
+
+add
+
+fullpage
+dir
+
+
+
+add
+
+searchreplace
+dir
+
+
+
+add
+
+fullscreen
+dir
+
+
+
+add
+
+imagetools
+dir
+
+
+
+add
+
+spellchecker
+dir
+
+
+
+add
+
+contextmenu
+dir
+
+
+
+add
+
+code
+dir
+
+
+
+add
+
+charmap
+dir
+
+
+
+add
+
+template
+dir
+
+
+
+add
+
+paste
+dir
+
+
+
+add
+
+codesample
+dir
+
+
+
+add
+
+bbcode
+dir
+
+
+
+add
+

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelInformationMapper">
+	<resultMap id="information" type="com.creatorblue.cbitedu.model.domain.ModelInformation">
+		<id column="info_id" property="infoId"/>
+		<result column="info_name" property="infoName"/>
+		<result column="info_value" property="infoValue"/>
+		<result column="info_type" property="infoType"/>
+		<result column="creater" property="creater"/>
+		<result column="create_date" property="createDate"/>
+		<result column="edit_date" property="editDate"/>
+		<result column="order_id" property="orderId"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		 info_id,info_name,info_value,creater,info_type,
+	 	 DATE_FORMAT(create_date,'%Y-%m-%d') as create_date,
+		 DATE_FORMAT(edit_date,'%Y-%m-%d') as edit_date,
+		order_id
+		</sql>
+	<select id="selectPageByMap" resultMap="information">
+		select 
+		<include refid="Base_Column_List" />
+		from t_model_information 
+	    <where>
+			<if test="infoType != null and '' != infoType">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				and  info_type LIKE CONCAT(CONCAT('%', #{infoType}),'%')	
+			</if>
+			
+		 </where>
+		 order by order_id
+	</select>
+	<select id="selectDetailById" resultMap="information" parameterType="String">
+		select
+			info_id,info_name,info_value,order_id,info_type
+		from t_model_information
+		where info_id=#{infoId}
+	</select>
+	
+	
+	<insert id="insert" parameterType="com.creatorblue.cbitedu.model.domain.ModelInformation">
+		insert into
+		t_model_information
+		(info_id,info_name,info_value,creater,create_date,info_type,order_id)
+		values
+		(#{infoId},#{infoName},#{infoValue},#{creater},now(),#{infoType},#{orderId})
+	</insert>
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelInformation">
+		update 
+		t_model_information 
+		<set>	
+		<if test="infoType != null and '' != infoType">
+		    info_type=#{infoType},
+		</if>
+		<if test="infoName != null and '' != infoName">
+		    info_name=#{infoName},
+		</if>
+		<if test="infoValue != null and '' != infoValue">
+		    info_value=#{infoValue},
+		</if>
+		<if test="orderId != null and '' != orderId">
+		    order_id=#{orderId},
+		</if>
+			edit_date=now()
+		</set>
+		where info_id=#{infoId} 
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from t_model_information where
+		info_id=#{infoId}
+	</delete>
+	<select id="selectByName" resultMap="information" parameterType="com.creatorblue.cbitedu.model.domain.ModelInformation">
+		select
+			*
+		from t_model_information
+		where info_name=#{infoName}
+	</select>
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelDictMapper">
+
+	<resultMap type="com.creatorblue.cbitedu.model.domain.ModelDict" id="dict">
+			<id column="dict_id" property="dictId"></id>
+			<result column="dict_type" property="dictType"/>
+			<result column="dict_value" property="dictValue"/>
+			<result column="dict_no" property="dictNo"/>
+			<result column="creater" property="creater"/>
+			<result column="create_date" property="createDate"/>
+			<result column="edit_date" property="editDate"/>
+	</resultMap>	
+			
+		
+
+<!-- sql模板 -->
+	<sql id="Base_Column_List">
+		dict_id,
+		dict_type,
+		dict_value,
+		dict_no,
+		creater,
+	  	DATE_FORMAT(create_date ,'%Y-%m-%d') as create_date ,
+		DATE_FORMAT(edit_date  ,'%Y-%m-%d') as edit_date 
+	</sql>
+	
+	
+	
+	<!-- 新增 -->
+	<insert id="add" parameterType="com.creatorblue.cbitedu.model.domain.ModelDict">
+		
+		INSERT INTO t_model_dict
+								(`dict_id`, `dict_type`,  `dict_value`, `dict_no`, `creater`, `create_date`)
+						 VALUES (#{dictId}, #{dictType},#{dictValue}, #{dictNo}, #{creater}, now())
+	</insert>
+	
+	<!--修改 -->
+	<update id="edit" parameterType="com.creatorblue.cbitedu.model.domain.ModelDict">
+		UPDATE t_model_dict 
+		SET
+		dict_type = #{dictType} ,
+		dict_value = #{dictValue} ,
+		dict_no = #{dictNo} ,
+		edit_date = #{editDate}
+		WHERE
+		dict_id = #{dictId} 
+	</update>
+	
+	<!-- 通过id查询 -->
+	<select id="selectById" parameterType="java.lang.String" resultMap="dict">
+		select 
+			<include refid="Base_Column_List" />
+		from t_model_dict
+		WHERE
+		dict_id = #{dictId} 
+	</select>
+	
+	<!-- 检查是否存在 -->
+	<select id="selectexist" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit" resultMap="dict">
+		select 
+			<include refid="Base_Column_List" />
+		from t_model_dict
+		where
+			dict_value = #{dictValue}
+	</select>
+
+	
+	
+	
+	<!-- 模糊查询 -->
+	<select id="select" parameterType="Map" resultMap="dict">
+		select 
+			<include refid="Base_Column_List"/>
+		from t_model_dict
+		<where>
+			
+			<if test="dictType != null and '' != dictType"> 
+				dict_type =#{dictType}
+			</if>
+			
+		</where>
+	</select>
+	
+	
+	
+	<!-- 删除 -->
+	<delete id="del" parameterType="java.lang.String">
+		DELETE FROM t_model_dict
+		WHERE
+			dict_id = #{dictId} 
+	</delete>
+	
+	<!-- 搜索框上面的回滚 -->
+	<select id="selectByType" resultMap="dict">
+		SELECT distinct dict_type
+		FROM t_model_dict
+	</select>
+	
+	<!--从字典表中查询图片类型-->
+	<select id="selectImgType" resultMap="dict">
+	select dict_value
+	from t_model_dict 
+	where dict_type = '图片类型管理'
+	
+	</select>
+	<!-- 从字典表中查询站点类型 -->
+	<select id="selectInformationType" resultMap="dict">
+	select dict_value
+	from t_model_dict 
+	where dict_type = '站点类型管理'
+	
+	</select>
+</mapper>

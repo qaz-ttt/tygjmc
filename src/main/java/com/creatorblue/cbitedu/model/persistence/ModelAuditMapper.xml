@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelAuditMapper">
+	<resultMap id="audit" type="com.creatorblue.cbitedu.model.domain.ModelAudit">
+		<id column="audit_id" property="auditId"/>
+		<result column="audit_people" property="auditPeople"/>
+		<result column="audit_time" property="auditTime"/>
+		<result column="audit_title" property="auditTitle"/>
+		<result column="audit_result" property="auditResult"/>
+		<result column="audit_remake" property="auditRemake"/>
+		<result column="audit_type" property="auditType"/>
+		<result column="audit_state" property="auditState"/>
+		<result column="creater" property="creater"/>
+		<result column="create_date" property="createDate"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+
+		audit_id,audit_people,audit_title,
+		 DATE_FORMAT(audit_time,'%Y-%m-%d') as audit_time,
+
+		audit_result,audit_remake,audit_type,audit_state,creater,
+		   DATE_FORMAT(create_date,'%Y-%m-%d') as create_date
+	</sql>
+	
+	<select id="selectPageByMap" resultMap="audit">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_audit
+		where 1=1
+		
+			<if test="auditResult != null and '' != auditResult">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				and audit_result =#{auditResult}
+			</if>
+			<if test="auditType != null and '' != auditType">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				and audit_type =#{auditType}
+			</if>
+	
+	</select>
+	
+	
+	<select id="selectDetailById" resultMap="audit" parameterType="String">
+		select
+		<include refid="Base_Column_List" />
+		from t_model_audit where audit_id=#{auditId}
+	</select>
+	
+	
+	<insert id="insert" parameterType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+		insert into
+		t_model_audit
+					(audit_id,audit_people,audit_title,audit_result,audit_remake,audit_type,audit_state,creater,create_date)
+		values
+					(#{auditId},#{auditPeople},#{auditTitle},#{auditResult},#{auditRemake},#{auditType},#{auditState},#{creater},now())
+	</insert>
+	
+	
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+		update 
+		t_model_audit 
+		<set>	
+		<if test="auditPeople != null and '' != auditPeople">
+		    audit_people=#{auditPeople},
+		</if>
+		
+		    
+	
+		<if test="auditResult != null and '' != auditResult">
+		    audit_result=#{auditResult},
+		</if>
+	     <if test="auditRemake != null and '' != auditRemake">
+		    audit_remake=#{auditRemake},
+		</if>
+		<if test="auditType != null and '' != auditType">
+		    audit_type=#{auditType},
+		</if>
+		<if test="auditState != null and '' != auditState">
+		    audit_state=#{auditState},
+		</if>
+		audit_time=now(),
+		</set>
+		where audit_id=#{auditId} 
+	</update>
+	
+	
+	
+	<delete id="delete" parameterType="String">
+		delete from t_model_audit where
+		audit_id=#{auditId}
+	</delete>
+	
+	<select id="selectByType"  resultMap="audit">
+	SELECT distinct audit_type
+	from t_model_audit
+		<where>
+			<if test="auditType != null and '' != auditType">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				audit_type=#{auditType}
+			</if>
+		</where>
+	</select>
+
+	
+</mapper>

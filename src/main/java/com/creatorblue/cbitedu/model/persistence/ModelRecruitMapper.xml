@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelRecruitMapper">
+
+	<resultMap type="com.creatorblue.cbitedu.model.domain.ModelRecruit" id="reruit">
+			<id column="recruit_id" property="recruitId"></id>
+			<result column="recruit_title" property="recruitTitle"/>
+			<result column="reruit_name" property="reruitName"/>
+			<result column="reruit_content" property="reruitContent"/>
+			<result column="reruit_pay" property="reruitPay"/>
+			<result column="reruit_num" property="reruitNum"/>
+			<result column="reruit_man" property="reruitMan"/>
+			<result column="reruit_contacts_phone" property="reruitContactsPhone"/>
+			<result column="end_time" property="endTime"/>
+			<result column="creater" property="creater"/> 
+			<result column="create_date" property="createDate"/>
+			<result column="edit_date" property="editDate"/>
+			<association property="audit" javaType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+				<id column="audit_id" property="auditId"/>
+				<result column="audit_people" property="auditPeople"/>
+				<result column="audit_time" property="auditTime"/>
+				<result column="audit_result" property="auditResult"/>
+				<result column="audit_remake" property="auditRemake"/>
+				<result column="audit_type" property="auditType"/>
+				<result column="audit_state" property="auditState"/>
+				<result column="creater" property="creater"/>
+				<result column="create_date" property="createDate"/>
+			</association>
+	</resultMap>	
+
+<!-- sql模板 -->
+	<sql id="Base_Column_List">
+		recruit_id,
+		recruit_title,
+		reruit_name,
+		reruit_content,
+		reruit_pay,
+		reruit_num,
+		reruit_man,
+		reruit_contacts_phone,
+		DATE_FORMAT(r.end_time,'%Y-%m-%d') as end_time,
+		r.creater,
+		DATE_FORMAT(r.create_date,'%Y-%m-%d') as create_date,
+		DATE_FORMAT(r.edit_date,'%Y-%m-%d') as edit_date
+	</sql>
+	
+	<!-- 新增 -->
+	<insert id="add" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit">
+		INSERT INTO t_model_recruit
+				(`recruit_id`, `recruit_title`, `reruit_name`, `reruit_content`, `reruit_pay`, `reruit_num`, `reruit_man`, `reruit_contacts_phone`, `end_time`, `creater`, `create_date`,audit_id)
+		 VALUES (#{recruitId}, #{recruitTitle}, #{reruitName}, #{reruitContent}, #{reruitPay}, #{reruitNum}, #{reruitMan}, #{reruitContactsPhone}, #{endTime}, #{creater}, now(),#{audit.auditId});
+	</insert>
+	
+	<!--修改 -->
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit">
+		UPDATE t_model_recruit 
+		SET
+		recruit_title = #{recruitTitle} ,
+		reruit_name = #{reruitName} ,
+		reruit_content = #{reruitContent} ,
+		reruit_num = #{reruitNum} ,
+		reruit_man = #{reruitMan} ,
+		reruit_contacts_phone = #{reruitContactsPhone},
+		end_time = #{endTime},
+		edit_date=now()
+		WHERE
+		recruit_id = #{recruitId}
+	</update>
+	
+	<!-- 通过id查询 -->
+	<select id="selectById" parameterType="java.lang.String" resultMap="reruit">
+		select 
+			<include refid="Base_Column_List" />
+		from t_model_recruit r
+		WHERE
+		recruit_id = #{recruitId} 
+	</select>
+	
+	<!-- 检查是否存在 -->
+	<select id="selectexist" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit" resultMap="reruit">
+		select 
+			<include refid="Base_Column_List" />
+		from t_model_recruit r
+		where
+			reruit_name = #{reruitName}
+	</select>
+
+	<!-- 模糊查询 -->
+	<select id="selectPageModelRecruitByMap" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit" resultMap="reruit">
+		select 
+		<!-- audit_result,audit_state, -->
+			<include refid="Base_Column_List" />
+		from t_model_recruit  r <!-- join t_model_audit a
+	     on r.audit_id = a.audit_id -->
+		<where>
+			<if test="reruitName != null and '' != reruitName">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+				reruit_name LIKE CONCAT(CONCAT('%', #{reruitName}),'%')
+			</if>
+		</where>
+	</select>
+	<!-- 前端查询 -->
+	<select id="selectPageByMap" parameterType="com.creatorblue.cbitedu.model.domain.ModelRecruit" resultMap="reruit">
+		select 
+		<include refid="Base_Column_List" />
+		from 
+		t_model_recruit r join t_model_audit  a on a.audit_id = r.audit_id 
+		where a.audit_result = '通过' ORDER BY  r.end_time asc
+	</select>
+	
+	
+	<!-- 删除 -->
+		<delete id="del" parameterType="java.lang.String">
+		DELETE FROM t_model_recruit
+		WHERE
+			recruit_id = #{recruitId} 
+	</delete>
+</mapper>

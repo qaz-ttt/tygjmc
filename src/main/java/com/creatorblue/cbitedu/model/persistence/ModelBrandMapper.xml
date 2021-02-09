@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.creatorblue.cbitedu.model.persistence.ModelBrandMapper">
+	<resultMap type="com.creatorblue.cbitedu.model.domain.ModelBrand"
+		id="brand">
+		<id column="brand_id" property="brandId" />
+		<result column="brand_name" property="brandName" />
+		<result column="creater" property="creater" />
+		<result column="create_date" property="createDate" />
+		<result column="edit_date" property="editDate" />
+		<result column="brand_state" property="brandState" />
+
+		<association property="img" javaType="com.creatorblue.cbitedu.model.domain.ModelImg">
+			<id column="img_id" property="imgId" />
+			<result column="img_url" property="imgUrl" />
+			<result column="img_start_time" property="imgStartTime" />
+			<result column="img_end_time" property="imgEndTime" />
+			<result column="img_upload_time" property="imgUploadTime" />
+			<result column="img_type" property="imgType" />
+			<result column="img_name" property="imgName" />
+		</association> 
+	<collection property="audit" ofType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+			<id property="auditId" column="audit_id"/>
+			<result property="auditPeople" column="audit_people"/>
+			<result property="auditTime" column="audit_time"/>
+			<result property="auditResult" column="audit_result"/>
+			<result property="auditRemake" column="audit_remake"/>
+			<result property="auditType" column="audit_type"/>
+			<result property="auditState" column="audit_state"/>
+			<result property="creater" column="creater"/>
+			<result property="createDate" column="create_date"/>
+		</collection>
+	</resultMap>
+	<sql id="brands">
+		brand_name,
+		b.img_id,
+		brand_id,
+		b.creater,
+		 DATE_FORMAT(b.create_date,'%Y-%m-%d') as create_date,
+		  DATE_FORMAT(b.edit_date,'%Y-%m-%d') as edit_date,
+		brand_state
+	</sql>
+	<select id="selectPageByMap" resultMap="brand" parameterType="Map">
+		select
+		img_url,img_type,img_start_time,img_end_time,img_upload_time,img_name,
+		<include refid="brands" />
+		from t_model_brand  b join t_model_img i 
+		on b.img_id = i.img_id
+		<where>
+			<if test="brandName != null and '' != brandName">  
+				brand_name = #{brandName}
+			</if>
+			<if test="brandState != null and '' != brandState">  
+				brand_state = #{brandState}
+			</if>
+			
+			
+		</where>
+		<if test="size != null and '' != size">  
+				order by create_date
+			</if>
+		
+	</select>
+	
+	
+	
+	
+	<select id="selectDetailById" resultMap="brand" parameterType="String">
+		select
+		img_url,img_type,img_start_time,img_end_time,img_upload_time,img_name,
+		<include refid="brands" />
+		from t_model_brand  b join t_model_img i 
+		on b.img_id = i.img_id
+		where brand_id=#{brandId}
+	</select>
+	
+	<insert id="insert" parameterType="com.creatorblue.cbitedu.model.domain.ModelBrand">
+		insert into
+		t_model_brand
+		(brand_id,brand_name,img_id,creater,create_date,edit_date,brand_state)
+		values
+		(#{brandId},#{brandName},#{img.imgId},#{creater},now(),#{editDate},#{brandState})
+
+	</insert>
+
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelBrand">
+
+		update 
+		t_model_brand
+		<set>	
+		<if test="brandId != null and '' != brandId">
+		    brand_id=#{brandId},
+		</if>
+		<if test="brandName != null and '' != brandName">
+		    brand_name=#{brandName},
+		</if>
+		<if test="img!=null and img != '' and img.imgId != null and '' != img.imgId   ">
+		    img_id=#{img.imgId},
+		</if>
+		<if test="creater != null and '' != creater">
+		    creater=#{creater},
+		</if>
+		<if test="createDate != null and '' != createDate">
+		    create_date=#{createDate},
+		</if>	
+		    
+		<if test="brandState != null and '' != brandState">
+		    brand_state=#{brandState},
+		</if>
+		edit_date=now()	
+		</set>
+		where brand_id=#{brandId}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from t_model_brand 
+		where
+		brand_id=#{brandId}
+	</delete>
+
+	<select id="selectByName" parameterType="com.creatorblue.cbitedu.model.domain.ModelBrand" resultMap="brand">
+	select
+	<include refid="brands"/>
+	from  t_model_brand  b
+	where 
+	brand_name = #{brandName}
+	</select>
+	
+	 <select id ="selectCar" parameterType="String"  resultType="Integer">
+		select count(*)
+		from t_model_car c join 
+		t_model_brand b 
+		on b.brand_id = c.brand_id
+		where b.brand_id = #{id}
+	</select> 
+</mapper>
