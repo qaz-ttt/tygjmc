@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.creatorblue.cbitedu.model.persistence.ModelCarMapper">
+	<resultMap id="car" type="com.creatorblue.cbitedu.model.domain.ModelCar">
+		<id column="car_id" property="carId"/>
+		<result column="car_name" property="carName" />
+		<result column="car_color" property="carColor" />
+		<result column="car_guar" property="carGuar" />
+		<result column="car_seller" property="carSeller" />
+		<result column="phone" property="phone" />
+		<result column="car_rele_time" property="carReleTime" />
+		<result column="car_state" property="carState" />
+		<result column="car_old_price" property="carOldPrice" />
+		<result column="car_now_price" property="carNowPrice" />
+		<result column="car_characteristic" property="carCharacteristic" />
+		<result column="car_content" property="carContent" />
+		<result column="car_sell_num" property="carSellNum" />
+		<result column="stock" property="stock" />
+		<result column="creater" property="creater" />
+		<result column="create_date" property="createDate" />
+		<result column="edit_date" property="editDate" />
+		<association property="brand" javaType="com.creatorblue.cbitedu.model.domain.ModelBrand">
+				<id column="brand_id" property="brandId" />
+					<result column="brand_name" property="brandName" />
+					<result column="creater" property="creater" />
+					<result column="create_date" property="createDate" />
+					<result column="edit_date" property="editDate" />
+				<association property="img" javaType="com.creatorblue.cbitedu.model.domain.ModelImg">
+						<id column="img_id" property="imgId" />
+						<result column="img_url" property="imgUrl" />
+						<result column="img_start_time" property="imgStartTime" />
+						<result column="img_end_time" property="imgEndTime" />
+						<result column="img_upload_time" property="imgUploadTime" />
+						<result column="img_type" property="imgType" />
+						<result column="img_name" property="imgName" />
+				</association>
+		</association>
+		<association property="audit" javaType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+			<id column="audit_id" property="auditId"/>
+			<result column="audit_people" property="auditPeople"/>
+			<result column="audit_time" property="auditTime"/>
+			<result column="audit_result" property="auditResult"/>
+			<result column="audit_title" property="auditTitle"/>
+			<result column="audit_remake" property="auditRemake"/>
+			<result column="audit_type" property="auditType"/>
+			<result column="audit_state" property="auditState"/>
+			<result column="creater" property="creater"/>
+			<result column="create_date" property="createDate"/>
+		</association>
+		<association property="carType" javaType="com.creatorblue.cbitedu.model.domain.ModelDict">
+			<id column="dict_id" property="dictId"></id>
+			<result column="dict_type" property="dictType"/>
+			<result column="aaa" property="dictValue"/>
+			<result column="dict_no" property="dictNo"/>
+			<result column="creater" property="creater"/>
+			<result column="create_date" property="createDate"/>
+			<result column="edit_date" property="editDate"/>
+		</association>
+		<association property="priceRange" javaType="com.creatorblue.cbitedu.model.domain.ModelDict">
+			<id column="dict_id" property="dictId"></id>
+			<result column="dict_type" property="dictType"/>
+			<result column="bbb" property="dictValue"/>
+			<result column="dict_no" property="dictNo"/>
+			<result column="creater" property="creater"/>
+			<result column="create_date" property="createDate"/>
+			<result column="edit_date" property="editDate"/>
+		</association>
+		
+		
+		<collection property="img" ofType="com.creatorblue.cbitedu.model.domain.ModelImg">
+			<id column="img_id" property="imgId" />
+			<result column="img_url" property="imgUrl" />
+			<result column="img_start_time" property="imgStartTime" />
+			<result column="img_end_time" property="imgEndTime" />
+			<result column="img_upload_time" property="imgUploadTime" />
+			<result column="img_type" property="imgType" />
+			<result column="img_name" property="imgName" />
+		</collection>
+	</resultMap>
+	
+	
+	
+	<sql id="cars">
+		t1.car_id, t2.brand_name, t3.audit_result, t1.car_type, t1.car_name, t1. car_color, t1.
+		car_guar, t1. car_seller, t1. phone, t1. price_range,
+		  DATE_FORMAT(t1.car_rele_time,'%Y-%m-%d') as car_rele_time , 
+		t1.car_state, t1.car_old_price, t1.car_now_price, t1.car_characteristic, t1.car_content, t1.car_sell_num, t1.stock, t1.creater,
+		  DATE_FORMAT(t1.create_date,'%Y-%m-%d') as create_date,
+		DATE_FORMAT(t1.edit_date ,'%Y-%m-%d') as  edit_date,
+		t4.dict_value as aaa,t5.dict_value as bbb,
+		i.img_url, t3.audit_state
+	</sql>
+	<sql id="from">
+				t_model_car t1 
+				left join t_model_brand t2 on t1.brand_id=t2.brand_id
+				left join t_model_audit t3 on t1.audit_id=t3.audit_id
+				left join t_model_dict  t4 on t1.car_type=t4.dict_id
+				left join t_model_dict  t5 on t1.price_range=t5.dict_id
+				left join t_model_img  i on t1.img_id = i.img_id
+	</sql>
+	
+		<!--查看所有汽车信息-->
+	<select id="selectPageByMap" resultMap="car" parameterType="Map">
+		SELECT
+				t1.car_id,t1.car_type, t1.car_name, t1. car_color, t1.car_guar, t1. car_seller, t1. phone, t1.price_range,t1.car_state,t1.img_id,
+				t1.car_old_price, t1.car_now_price, t1.car_characteristic, t1.car_content, t1.car_sell_num, t1.stock, t1.creater,
+				DATE_FORMAT(t1.car_rele_time,'%Y-%m-%d') as car_rele_time , 
+				DATE_FORMAT(t1.create_date,'%Y-%m-%d') as create_date,
+				DATE_FORMAT(t1.edit_date ,'%Y-%m-%d') as  edit_date,
+				 t2.brand_name, t3.audit_result, 
+				 t3.audit_state,
+				t4.dict_value as aaa,t5.dict_value as bbb
+				
+		from 
+				t_model_car t1 
+				left join t_model_brand t2 on t1.brand_id=t2.brand_id
+				left join t_model_audit t3 on t1.audit_id=t3.audit_id
+				left join t_model_dict  t4 on t1.car_type=t4.dict_id
+				left join t_model_dict  t5 on t1.price_range=t5.dict_id
+		
+		
+		<where>
+			<!-- 汽车类型 -->
+			<if test="carType != null and '' != carType"> 
+				t4.dict_value=#{carType}
+			</if>
+			<!-- 价格区间 -->
+			<if test="priceRange != null and '' != priceRange">  
+				t5.dict_value=#{priceRange}
+			</if>
+			<!-- 品牌 -->
+			<if test="brandName != null and '' != brandName">  
+				t2.brand_name =#{brandName}
+			</if>
+			<!-- 审核 -->
+			<if test="audit != null and '' != audit">  
+				t1.audit_id =#{audit.auditId}
+			</if>
+			<!--状态-->
+			<if test="audit != null and '' != audit.auditResult != null and '' != audit.auditResult">  
+				t3.audit_result =#{audit.auditResult}
+			</if>
+			<if test="result != null and '' != result ">  
+				t3.audit_result ='通过'
+			</if>
+		</where>
+			<if test="carSellNum != null and '' != carSellNum">  
+				order by t1.car_sell_num desc
+				limit 4
+			</if>
+			<if test="carSellNum1 != null and '' != carSellNum1">  
+				order by t1.car_sell_num desc
+				limit 3
+			</if>
+			<if test="createDate != null and '' != createDate">  
+				order by t1.create_date  desc
+				limit 4
+			</if>
+			<if test="createDate1 != null and '' != createDate1">  
+				order by t1.create_date  desc
+				limit 3
+			</if>
+			<if test="limit != null and '' != limit">  
+				limit 9
+			</if>
+			
+		</select>
+		
+		<!--删除-->
+	<delete id="delete" parameterType="java.lang.String">
+		DELETE FROM t_model_car WHERE car_id=#{carId}
+	</delete>
+	
+	
+	 <insert id="insert" parameterType="com.creatorblue.cbitedu.model.domain.ModelCar"  >
+		INSERT INTO t_model_car
+				(car_id ,brand_id,audit_id, car_type, car_name, car_color, car_guar, car_seller, phone, price_range, car_rele_time, car_state, car_old_price, car_now_price, car_characteristic, car_content, car_sell_num, stock, creater, create_date)
+		VALUES (#{carId},#{brand.brandId}, #{audit.auditId},#{carType.dictId}, #{carName}, #{carColor}, #{carGuar}, #{carSeller}, #{phone}, #{priceRange.dictId}, now(), #{carState},#{carOldPrice},#{carNowPrice}, #{carCharacteristic},#{carContent}, #{carSellNum},  #{stock},#{creater},now())
+	</insert>
+	
+	
+	<update id="update" parameterType="com.creatorblue.cbitedu.model.domain.ModelCar" >
+		UPDATE t_model_car
+		<set>
+			<if test="brand !=null and brand !=''">
+				brand_id = #{brand.brandId} ,
+			</if>
+			<if test="audit !=null and audit !=''">
+				audit_id = #{audit.auditId} ,
+			</if>
+			<if test="carType !=null and carType !=''">
+				car_type = #{carType.dictId} ,
+			</if>
+			<if test="carName !=null and carName !=''">
+				car_name = #{carName} ,
+			</if>
+			<if test="carColor !=null and carColor !=''">
+				car_color = #{carColor} ,
+			</if>
+			<if test="carGuar !=null and carGuar !=''">
+				car_guar = #{carGuar},
+			</if>
+			<if test="carSeller !=null and carSeller !=''">
+				car_seller = #{carSeller} ,
+			</if>
+			<if test="phone !=null and phone !=''">
+				phone = #{phone},
+			</if>
+			<if test="priceRange !=null and priceRange !=''">
+				price_range = #{priceRange.dictId} ,
+			</if>
+			<if test="carReleTime !=null and carReleTime !=''">
+				car_rele_time = now() ,
+			</if>
+			<if test="carState !=null and carState !=''">
+				car_state = #{carState},
+			</if>
+			<if test="carOldPrice !=null and carOldPrice !=''">
+				car_old_price=#{carOldPrice},
+			</if>
+			<if test="carNowPrice !=null and carNowPrice !=''">
+				car_now_price =#{carNowPrice},
+			</if>
+			<if test="carCharacteristic !=null and carCharacteristic !=''">
+				car_characteristic = #{carCharacteristic},
+			</if>
+			<if test="carContent !=null and carContent !=''">
+				car_content = #{carContent},
+			</if>
+			<if test="carSellNum !=null and carSellNum !=''">
+				car_sell_num = #{carSellNum} ,
+			</if>
+			<if test="stock!=null and stock !=''">
+				stock = #{stock},
+			</if>
+			
+			 edit_date = now()
+		</set>
+		WHERE car_id = #{carId}
+	</update>
+	
+	
+	<select id="selectDetailById" parameterType="String" resultMap="car">
+		SELECT
+			t1.car_id, t2.brand_name, t3.audit_result, t1.car_type, t1.car_name, t1. car_color,
+			 t1.car_guar, t1. car_seller, t1. phone, t1. price_range,
+			  DATE_FORMAT(t1.car_rele_time,'%Y-%m-%d') as car_rele_time , 
+			t1.car_state, t1.car_old_price, t1.car_now_price, t1.car_characteristic, t1.car_content, t1.car_sell_num, t1.stock, t1.creater,
+			  DATE_FORMAT(t1.create_date,'%Y-%m-%d') as create_date,
+			DATE_FORMAT(t1.edit_date ,'%Y-%m-%d') as  edit_date,
+			t4.dict_value as aaa,t5.dict_value as bbb,t1.img_id
+		from 
+			t_model_car t1 
+				left join t_model_brand t2 on t1.brand_id=t2.brand_id
+				left join t_model_audit t3 on t1.audit_id=t3.audit_id
+				left join t_model_dict  t4 on t1.car_type=t4.dict_id
+				left join t_model_dict  t5 on t1.price_range=t5.dict_id
+		where car_id=#{carId}
+	</select>
+		
+		
+		
+	<update id="updateImg" parameterType="Map">
+		UPDATE t_model_car
+		set
+			
+				img_id = #{imgId} 
+		where	car_id=#{carId}
+	</update>
+	
+	<select id="selectByAudit" parameterType="String" resultMap="car">
+		SELECT
+			t1.car_id, t2.brand_name, t3.audit_result, t1.car_type, t1.car_name, t1. car_color,
+			 t1.car_guar, t1. car_seller, t1. phone, t1. price_range,
+			  DATE_FORMAT(t1.car_rele_time,'%Y-%m-%d') as car_rele_time , 
+			t1.car_state, t1.car_old_price, t1.car_now_price, t1.car_characteristic, t1.car_content, t1.car_sell_num, t1.stock, t1.creater,
+			  DATE_FORMAT(t1.create_date,'%Y-%m-%d') as create_date,
+			DATE_FORMAT(t1.edit_date ,'%Y-%m-%d') as  edit_date,
+			t4.dict_value as aaa,t5.dict_value as bbb,t1.img_id
+		from 
+			t_model_car t1 
+				left join t_model_brand t2 on t1.brand_id=t2.brand_id
+				left join t_model_audit t3 on t1.audit_id=t3.audit_id
+				left join t_model_dict  t4 on t1.car_type=t4.dict_id
+				left join t_model_dict  t5 on t1.price_range=t5.dict_id
+
+		where
+						t1.audit_id = #{_parameter}
+		
+	</select>
+	<select id="selectCountBytitle" parameterType="String" resultType="Integer" >
+		select count(*) 
+		from t_model_car 
+		where car_name = #{_parameter}
+	</select>
+
+
+</mapper>

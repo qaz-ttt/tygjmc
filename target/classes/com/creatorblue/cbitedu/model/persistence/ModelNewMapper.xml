@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.creatorblue.cbitedu.model.persistence.ModelNewMapper">
+	<resultMap type="com.creatorblue.cbitedu.model.domain.ModelNew"
+		id="new">
+		<id column="new_id" property="newId" />
+		<result column="new_title" property="newTitle" />
+		<result column="new_content" property="newContent" />
+		<result column="new_rele_time" property="newReleTime" />
+		<result column="new_rele_man" property="newReleMan" />
+		<result column="new_state" property="newState" />
+		<result column="new_type" property="newType" />
+		<result column="creater" property="creater" />
+		<result column="create_date" property="createDate" />
+		<result column="edit_date" property="editDate" />
+	   <association property="img" javaType="com.creatorblue.cbitedu.model.domain.ModelImg">
+		<id column="img_id" property="imgId" />
+		<result column="img_url" property="imgUrl" />
+		<result column="img_start_time" property="imgStartTime" />
+		<result column="img_end_time" property="imgEndTime" />
+		<result column="img_upload_time" property="imgUploadTime" />
+		<result column="img_type" property="imgType" />
+		<result column="img_name" property="imgName" />
+	</association>
+	<collection property="audit" ofType="com.creatorblue.cbitedu.model.domain.ModelAudit">
+			<id property="auditId" column="audit_id"/>
+			<result property="auditPeople" column="audit_people"/>
+			<result property="auditTime" column="audit_time"/>
+			<result property="auditResult" column="audit_result"/>
+			<result property="auditTitle" column="audit_title"/>
+			<result property="auditRemake" column="audit_remake"/>
+			<result property="auditType" column="audit_type"/>
+			<result property="auditState" column="audit_state"/>
+			<result property="creater" column="creater"/>
+			<result property="createDate" column="create_date"/>
+		</collection>
+	</resultMap>
+
+    <sql id="news">
+     new_id,new_title,new_content,DATE_FORMAT(new_rele_time,'%Y-%m-%d') new_rele_time,
+		new_rele_man, new_state, new_type, n.creater,DATE_FORMAT(n.create_date,'%Y-%m-%d') as create_date,
+		 DATE_FORMAT(n.edit_date,'%Y-%m-%d')as edit_date,n.img_id,n.audit_id
+    </sql>
+  
+	<!--查看所有新闻信息-->
+	<select id="select" resultMap="new" parameterType="Map">
+		SELECT 
+		img_url,a.audit_result,audit_state,
+		<include refid="news" />
+		from t_model_new  n  join t_model_img i 
+		on n.img_id = i.img_id
+		join t_model_audit  a 
+		on a.audit_id = n.audit_id
+		<where>
+			<if test="newTitle !=null and newTitle !=''">
+				<bind name="likename" value="'%'+ newTitle +'%'"/>
+      			and new_title  like #{likename}
+    	 </if>
+		 <if test="newReleMan !=null and newReleMan !=''">
+	          <bind name="likeman" value="'%'+ newReleMan +'%'"/>
+	      		and new_rele_man like #{likeman}
+	     </if>
+	      <if test="newType !=null and newType !=''">
+	         	and  new_type = #{newType}
+	     </if>
+	    </where>
+			order by create_date desc
+    	 <if test="size !=null and size !=''">
+    		 limit 3
+	     </if>
+	    
+		
+	</select>
+
+	<!--删除-->
+	<delete id="delete" parameterType="java.lang.String">
+		DELETE FROM t_model_new WHERE new_id=#{newId}
+	</delete>
+
+	<insert id="insert"
+		parameterType="com.creatorblue.cbitedu.model.domain.ModelNew">
+		INSERT INTO t_model_new (new_id,new_title,new_content,
+		new_rele_time, new_rele_man, new_state, new_type, creater,
+		create_date, edit_date,img_id,audit_id) VALUES ( #{newId} ,#{newTitle}
+		,#{newContent} ,now(),#{newReleMan}
+		,#{newState},#{newType}, #{creater},now(),#{editDate},#{img.imgId},#{audit.auditId} )
+
+	</insert>
+	<update id="update"
+		parameterType="com.creatorblue.cbitedu.model.domain.ModelNew">
+		UPDATE t_model_new
+		<set>
+			<if test="newTitle !=null and newTitle !=''">
+				new_title = #{newTitle} ,
+			</if>
+			<if test="newContent !=null and newContent !=''">
+				new_content = #{newContent} ,
+			</if>
+			<if test="newReleMan !=null and newReleMan !=''">
+				new_rele_man = #{newReleMan} ,
+			</if>
+			<if test="newState !=null and newState !=''">
+				new_state = #{newState},
+			</if>
+			<if test="newReleTime !=null and newReleTime !=''">
+				new_rele_time = #{newReleTime} ,
+			</if>
+			<if test="newReleMan !=null and newReleMan !=''">
+				new_rele_man = #{newReleMan} ,
+			</if>
+			<if test="creater !=null and creater !=''">
+				creater = #{creater} ,
+			</if>
+			<if test="createDate !=null and createDate !=''">
+				create_date = #{createDate} ,
+			</if>
+			<if test="editDate !=null and editDate !=''">
+				edit_time = #{editDate}
+			</if>
+			<if test="img !=null and img !='' and img.imgId !=null and img.imgId !=''">
+				img_id = #{img.imgId}
+			</if>
+			<if test="audit !=null and audit !=''">
+				audit_id = #{audit.auditId}
+			</if>
+			<if test="newType !=null and newType !=''">
+				new_type = #{newType}
+			</if>
+		</set>
+		WHERE new_id = #{newId}
+	</update>
+	<select id="selectnewById" resultMap="new" parameterType="String">
+		SELECT 
+		i.img_url,a.audit_result,audit_state,
+		<include refid="news" />
+		from t_model_new  n  join t_model_img i 
+		on n.img_id = i.img_id join t_model_audit  a 
+		on a.audit_id = n.audit_id
+		where
+		new_id=#{newId}
+	</select>
+	
+	
+	<select id="selectNewByAudit" resultMap="new" parameterType="String">
+		SELECT 
+		i.img_url,a.audit_result,audit_state,
+		<include refid="news" />
+		from t_model_new  n  join t_model_img i 
+		on n.img_id = i.img_id join t_model_audit  a 
+		on a.audit_id = n.audit_id
+		 where n.audit_id = #{auditId}
+	</select>
+	
+	
+	
+	
+	
+
+ <select id="selectBytitle" parameterType="com.creatorblue.cbitedu.model.domain.ModelNew" resultMap="new">
+	select 
+	<include refid="news"/>
+	from t_model_new n 
+	where 
+	new_title = #{newTitle}
+</select>
+<select id="selectByEnterprise" parameterType="com.creatorblue.cbitedu.model.domain.ModelNew" resultMap="new">
+	select i.img_url,a.audit_result,
+	<include refid="news"/>
+	from t_model_new  n  join t_model_img i 
+		on n.img_id = i.img_id
+		join t_model_audit  a 
+		on a.audit_id = n.audit_id
+	where 
+	<if test="newType != null and '' != newType">  <!-- #{} 是调用预处理，而${}则是字符串替换， 常用语排序里面 -->
+			 new_type =#{newType}
+	</if>
+	and a.audit_result = '通过'
+	ORDER BY  new_rele_time DESC
+</select>
+<select id="selectContentById" resultMap="new" parameterType="String">
+	select i.img_url,
+	<include refid="news"/>
+	from t_model_new  n  join t_model_img i 
+	on n.img_id = i.img_id
+	where
+	new_id=#{newId}
+</select>
+</mapper>
